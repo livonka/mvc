@@ -14,15 +14,24 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: kkk111
+    volumes:
+      - type: volume
+        source: datab
+        target: /var/lib/mysql
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     environment:
-     - PMA_ARBITRARY=1
+      - PMA_ARBITRARY=1
     restart: always
     ports:
-     - 8080:80
+      - 8080:80
     volumes:
-     - /sessions
+      - type: volume
+        source: phpadminvol
+        target: /sessions
     depends_on:
-     - db
+      - db
+volumes:
+  datab:
+  phpadminvol:
