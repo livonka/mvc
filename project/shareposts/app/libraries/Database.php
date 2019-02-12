@@ -32,7 +32,7 @@ class Database {
     public function query($sql){
         $this->statement = $this->db_handler->prepare($sql);
     }
-
+//////////////////////////////////кгда ставим ::
     //bind values
     public function bind($param, $value, $type = null){
         if (is_null($type)){
@@ -52,6 +52,7 @@ class Database {
         }
         $this->statement->bindValue($param, $value, $type);
     }
+	////////////////////////////////зачем такая функция, мы просто чужую вызываем без изменений
     //execute prepared statement
     public function execute(){
         return $this->statement->execute();

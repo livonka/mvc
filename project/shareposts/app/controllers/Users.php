@@ -59,6 +59,7 @@ class Users extends Controller {
 
                 //register user
                 if ($this->user_model->register($data)){
+                    flash('register_success', 'You are registered and can log in.');
                     redirect('users/login');
                 }
                 else {
@@ -106,10 +107,25 @@ class Users extends Controller {
             if (empty($data['password'])){
                 $data['err_password'] = 'Please enter the password.';
             }
-
+            //check for user/email in db
+            if ($this->user_model->find_user_by_email($data['email'])){
+                //TODO: user found
+            }
+            else {
+                //user not found
+                $data['err_email'] = 'There is no such email.';
+            }
             //Make sure there are no errors
             if ( empty($data['err_email']) && empty($data['err_password'])){
-                die('SUCCESS');
+                //check and set user logged in
+                $logged_in_user = $this->user_model->login($data['email'], $data['password']);
+                if ($logged_in_user){
+                    $this->create_user_session($logged_in_user);
+                }
+                else {
+                    $data['err_password'] = 'Password incorrect';
+                    $this->view('users/login' , $data);
+                }
             }
             else {
                 //load view with errors
@@ -127,5 +143,20 @@ class Users extends Controller {
             //Load view
             $this->view('users/login', $data);
         }
+    }
+
+    public function create_user_session($user){
+        $_SESSION['user_id']= $user->id;
+        $_SESSION['user_email']= $user->email;
+        $_SESSION['user_name']= $user->name;
+        redirect('posts');
+    }
+
+    public function logout(){
+        unset($_SESSION['user_id']);
+        unset($_SESSION['user_name']);
+        unset($_SESSION['user_email']);
+        session_destroy();
+        redirect('users/login');
     }
 }
